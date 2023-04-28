@@ -28,7 +28,7 @@ public class OpenRouteServiceDistanceMatrix {
         return list;
     }
 
-    public double[][] apiCall() throws IOException {
+    public List<List<Double>> apiCall() throws IOException {
         Client client = ClientBuilder.newClient();
         ArrayList<List<Double>> jsonList = convertListToJSONArray();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -49,31 +49,34 @@ public class OpenRouteServiceDistanceMatrix {
 
         JsonNode matrix = objectMapper.readTree(responseBody).get("durations");
         int size = matrix.size();
-        double[][] timeDistanceMatrix = new double[size][size];
+        List<List<Double>> timeDistanceMatrix = new ArrayList<>();
         for (int i = 0; i < size; i++) {
+            List<Double> row = new ArrayList<>();
             for (int j = 0; j < size; j++) {
-                timeDistanceMatrix[i][j] = matrix.get(i).get(j).asDouble();
+                row.add(matrix.get(i).get(j).asDouble());
             }
+            timeDistanceMatrix.add(row);
         }
         return timeDistanceMatrix;
     }
 
-    public void printMatrix() throws IOException {
-        double[][] timeDistanceMatrix = apiCall();
-        System.out.print("\n[");
-        for (int i = 0; i < timeDistanceMatrix.length; i++) {
-            if (i > 0) {
-                System.out.print(", ");
-            }
-            System.out.print("[");
-            for (int j = 0; j < timeDistanceMatrix[i].length; j++) {
-                if (j > 0) {
-                    System.out.print(", ");
+        public void printMatrix() throws IOException {
+            List<List<Double>> timeDistanceMatrix = apiCall();
+            System.out.print("\n{\n");
+            for (int i = 0; i < timeDistanceMatrix.size(); i++) {
+                System.out.print("    {");
+                for (int j = 0; j < timeDistanceMatrix.get(i).size(); j++) {
+                    System.out.print(timeDistanceMatrix.get(i).get(j));
+                    if (j < timeDistanceMatrix.get(i).size() - 1) {
+                        System.out.print(", ");
+                    }
                 }
-                System.out.printf("%.0f", timeDistanceMatrix[i][j]);
+                System.out.print("}");
+                if (i < timeDistanceMatrix.size() - 1) {
+                    System.out.print(",");
+                }
+                System.out.println();
             }
-            System.out.print("]");
+            System.out.print("}");
         }
-        System.out.println("]");
-    }
 }
