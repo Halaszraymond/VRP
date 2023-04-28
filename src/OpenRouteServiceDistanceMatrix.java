@@ -18,6 +18,7 @@ public class OpenRouteServiceDistanceMatrix {
     }
     // Converting a list of locations to a JSON array
     public ArrayList<List<Double>> convertListToJSONArray() {
+        // Makes an ArrayList<List<Double>> of the locations and returns it
         ArrayList list = new ArrayList();
         for (Location location : locations) {
             ArrayList<Double> newLocation = new ArrayList<Double>();
@@ -33,8 +34,11 @@ public class OpenRouteServiceDistanceMatrix {
         ArrayList<List<Double>> jsonList = convertListToJSONArray();
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(jsonList);
+        // Formats the locations as JSON array
         jsonString = "{\"locations\":" + jsonString + "}";
+        // Creates the request
         Entity<String> payload = Entity.entity(jsonString, MediaType.APPLICATION_JSON);
+        // Gets the response
         Response response = client.target("https://api.openrouteservice.org/v2/matrix/driving-car")
                 .request()
                 .header("Authorization", apiKey)
@@ -42,12 +46,15 @@ public class OpenRouteServiceDistanceMatrix {
                 .header("Content-Type", "application/json; charset=utf-8")
                 .post(payload);
 
+        // Prints the response and status of the request
         System.out.println("status: " + response.getStatus());
         System.out.println("headers: " + response.getHeaders());
         String responseBody = response.readEntity(String.class);
         System.out.println("body:" + responseBody);
 
+        // Converts the response to JSON
         JsonNode matrix = objectMapper.readTree(responseBody).get("durations");
+        // Converts the JSON array to a long[][]
         int size = matrix.size();
         long[][] timeDistanceMatrix = new long[size][size];
         for (int i = 0; i < size; i++) {
@@ -59,6 +66,7 @@ public class OpenRouteServiceDistanceMatrix {
     }
 
     public void printMatrix() throws IOException {
+        // This method prints the matrix in the format that is provided by OR-Tools
         long[][] timeDistanceMatrix = apiCall();
         System.out.print("{\n");
         for (int i = 0; i < timeDistanceMatrix.length; i++) {

@@ -29,21 +29,15 @@ public class Geocoder {
             response.append(inputLine);
         }
         in.close();
+        // Converts the response to JSON
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonResponse = objectMapper.readTree(response.toString());
+        // Gets the latitude and longitude
         JsonNode results = jsonResponse.get("results");
         JsonNode result = results.get(0);
         JsonNode geometry = result.get("geometry");
         double latitude = geometry.get("lat").asDouble();
         double longitude = geometry.get("lng").asDouble();
-        // Converts the response to JSON
-//        JSONObject jsonResponse = new JSONObject(response.toString());
-//        // Gets the latitude and longitude
-//        JSONArray results = jsonResponse.getJSONArray("results");
-//        JSONObject result = results.getJSONObject(0);
-//        JSONObject geometry = result.getJSONObject("geometry");
-//        double latitude = geometry.getDouble("lat");
-//        double longitude = geometry.getDouble("lng");
 
         // Creates the location using Location class
         return new Location(latitude, longitude);
