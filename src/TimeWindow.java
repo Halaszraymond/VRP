@@ -2,6 +2,7 @@ public class TimeWindow {
     private int start;
     private int end;
 
+    // This class is used to store the start and end time of a time window.
     public TimeWindow(int start, int end) {
         this.start = start;
         this.end = end;
