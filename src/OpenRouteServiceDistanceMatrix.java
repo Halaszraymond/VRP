@@ -1,59 +1,79 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 public class OpenRouteServiceDistanceMatrix {
-    private final String apiKey;
-    public OpenRouteServiceDistanceMatrix(String apiKey) {
+    private String apiKey;
+    private List<Location> locations;
+    public OpenRouteServiceDistanceMatrix (String apiKey, List<Location> locations) {
         this.apiKey = apiKey;
+        this.locations = locations;
     }
-    public double[][] getTimeDistance(List<Location> locations) throws Exception {
-        // get size of list of locations to determine the size of distance matrix
-        int numLocations = locations.size();
-        double[][] timeDistanceMatrix = new double[numLocations][numLocations];
-
-        // Creates the requests to the OpenRouteService API
-        String url = "https://api.openrouteservice.org/v2/matrix/driving-car";
-        HttpClient httpClient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-
-        // Creates a list of coordinates for the locations to be sent to the OpenRouteService API
-        List<List<Double>> coordinates = new ArrayList<>();
+    // Converting a list of locations to a JSON array
+    public ArrayList<List<Double>> convertListToJSONArray() {
+        ArrayList list = new ArrayList();
         for (Location location : locations) {
-            List<Double> coordinate = new ArrayList<>();
-            coordinate.add(location.getLongitude());
-            coordinate.add(location.getLatitude());
-            coordinates.add(coordinate);
+            ArrayList<Double> newLocation = new ArrayList<Double>();
+            newLocation.add(location.getLongitude());
+            newLocation.add(location.getLatitude());
+            list.add(newLocation);
         }
+        return list;
+    }
+
+    public double[][] apiCall() throws IOException {
+        Client client = ClientBuilder.newClient();
+        ArrayList<List<Double>> jsonList = convertListToJSONArray();
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(coordinates);
+        String jsonString = objectMapper.writeValueAsString(jsonList);
+        jsonString = "{\"locations\":" + jsonString + "}";
+        Entity<String> payload = Entity.entity(jsonString, MediaType.APPLICATION_JSON);
+        Response response = client.target("https://api.openrouteservice.org/v2/matrix/driving-car")
+                .request()
+                .header("Authorization", apiKey)
+                .header("Accept", "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8")
+                .header("Content-Type", "application/json; charset=utf-8")
+                .post(payload);
 
-        // Sends the coordinates to the OpenRouteService API
-        StringEntity entity = new StringEntity("{\"locations\":" + json + ",\"metrics\":[\"duration\"]}");
-        httpPost.setEntity(entity);
-        httpPost.setHeader("Accept", "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8");
-        httpPost.setHeader("Authorization", apiKey);
-        httpPost.setHeader("Content-type", "application/json");
+        System.out.println("status: " + response.getStatus());
+        System.out.println("headers: " + response.getHeaders());
+        String responseBody = response.readEntity(String.class);
+        System.out.println("body:" + responseBody);
 
-        // Makes the request
-        HttpResponse response = httpClient.execute(httpPost);
-        String result = EntityUtils.toString(response.getEntity());
-
-
-        // Creates a list of distances for each location
-        for (int i = 0; i < numLocations; i++) {
-            for (int j = 0; j < numLocations; j++) {
-                int index = i * numLocations + j;
-                double duration = objectMapper.readTree(result).at("/durations/0/" + index).asDouble();
-                timeDistanceMatrix[i][j] = duration;
+        JsonNode matrix = objectMapper.readTree(responseBody).get("durations");
+        int size = matrix.size();
+        double[][] timeDistanceMatrix = new double[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                timeDistanceMatrix[i][j] = matrix.get(i).get(j).asDouble();
             }
         }
         return timeDistanceMatrix;
+    }
+
+    public void printMatrix() throws IOException {
+        double[][] timeDistanceMatrix = apiCall();
+        System.out.print("\n[");
+        for (int i = 0; i < timeDistanceMatrix.length; i++) {
+            if (i > 0) {
+                System.out.print(", ");
+            }
+            System.out.print("[");
+            for (int j = 0; j < timeDistanceMatrix[i].length; j++) {
+                if (j > 0) {
+                    System.out.print(", ");
+                }
+                System.out.printf("%.0f", timeDistanceMatrix[i][j]);
+            }
+            System.out.print("]");
+        }
+        System.out.println("]");
     }
 }

@@ -7,10 +7,14 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="json" level="project" />
     <orderEntry type="library" name="google.maps.services" level="project" />
     <orderEntry type="library" name="google.ortools.darwin" level="project" />
-    <orderEntry type="library" name="apache.httpcomponents.fluent.hc" level="project" />
+    <orderEntry type="library" name="glassfish.jersey.core.client" level="project" />
+    <orderEntry type="library" name="glassfish.jersey.inject.hk2" level="project" />
+    <orderEntry type="library" name="javax.activation" level="project" />
+    <orderEntry type="library" name="javax.ws.rs.api" level="project" />
     <orderEntry type="library" name="fasterxml.jackson.core.databind" level="project" />
+    <orderEntry type="library" name="javax.xml.bind.jaxb.api" level="project" />
+    <orderEntry type="library" name="jakarta.activation.api" level="project" />
   </component>
 </module>

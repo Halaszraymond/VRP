@@ -3,8 +3,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class Geocoder {
     private String apiKey;
@@ -29,14 +29,21 @@ public class Geocoder {
             response.append(inputLine);
         }
         in.close();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonResponse = objectMapper.readTree(response.toString());
+        JsonNode results = jsonResponse.get("results");
+        JsonNode result = results.get(0);
+        JsonNode geometry = result.get("geometry");
+        double latitude = geometry.get("lat").asDouble();
+        double longitude = geometry.get("lng").asDouble();
         // Converts the response to JSON
-        JSONObject jsonResponse = new JSONObject(response.toString());
-        // Gets the latitude and longitude
-        JSONArray results = jsonResponse.getJSONArray("results");
-        JSONObject result = results.getJSONObject(0);
-        JSONObject geometry = result.getJSONObject("geometry");
-        double latitude = geometry.getDouble("lat");
-        double longitude = geometry.getDouble("lng");
+//        JSONObject jsonResponse = new JSONObject(response.toString());
+//        // Gets the latitude and longitude
+//        JSONArray results = jsonResponse.getJSONArray("results");
+//        JSONObject result = results.getJSONObject(0);
+//        JSONObject geometry = result.getJSONObject("geometry");
+//        double latitude = geometry.getDouble("lat");
+//        double longitude = geometry.getDouble("lng");
 
         // Creates the location using Location class
         return new Location(latitude, longitude);

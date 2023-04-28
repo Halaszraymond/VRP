@@ -1,0 +1,20 @@
+<component name="libraryTable">
+  <library name="glassfish.jersey.inject.hk2" type="repository">
+    <properties maven-id="org.glassfish.jersey.inject:jersey-hk2:3.1.1" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/jersey/inject/jersey-hk2/3.1.1/jersey-hk2-3.1.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/jersey/core/jersey-common/3.1.1/jersey-common-3.1.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/jakarta/ws/rs/jakarta.ws.rs-api/3.1.0/jakarta.ws.rs-api-3.1.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/hk2/osgi-resource-locator/1.0.3/osgi-resource-locator-1.0.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/hk2/hk2-locator/3.0.3/hk2-locator-3.0.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/hk2/external/aopalliance-repackaged/3.0.3/aopalliance-repackaged-3.0.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/hk2/hk2-api/3.0.3/hk2-api-3.0.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/hk2/hk2-utils/3.0.3/hk2-utils-3.0.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/javassist/javassist/3.29.0-GA/javassist-3.29.0-GA.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
