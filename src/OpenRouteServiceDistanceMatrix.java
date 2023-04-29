@@ -29,7 +29,7 @@ public class OpenRouteServiceDistanceMatrix {
         return list;
     }
 
-    public long[][] apiCall() throws IOException {
+    public long[][] createMatrix() throws IOException {
         Client client = ClientBuilder.newClient();
         ArrayList<List<Double>> jsonList = convertListToJSONArray();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -50,7 +50,7 @@ public class OpenRouteServiceDistanceMatrix {
         System.out.println("status: " + response.getStatus());
         System.out.println("headers: " + response.getHeaders());
         String responseBody = response.readEntity(String.class);
-        System.out.println("body:" + responseBody);
+        System.out.println("body:" + responseBody + "\n");
 
         // Converts the response to JSON
         JsonNode matrix = objectMapper.readTree(responseBody).get("durations");
@@ -67,7 +67,7 @@ public class OpenRouteServiceDistanceMatrix {
 
     public void printMatrix() throws IOException {
         // This method prints the matrix in the format that is provided by OR-Tools
-        long[][] timeDistanceMatrix = apiCall();
+        long[][] timeDistanceMatrix = createMatrix();
         System.out.print("{\n");
         for (int i = 0; i < timeDistanceMatrix.length; i++) {
             System.out.print("    {");

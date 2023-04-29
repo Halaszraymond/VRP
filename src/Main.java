@@ -1,5 +1,14 @@
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
+import com.google.ortools.Loader;
+import com.google.ortools.constraintsolver.Assignment;
+import com.google.ortools.constraintsolver.FirstSolutionStrategy;
+import com.google.ortools.constraintsolver.RoutingDimension;
+import com.google.ortools.constraintsolver.RoutingIndexManager;
+import com.google.ortools.constraintsolver.RoutingModel;
+import com.google.ortools.constraintsolver.RoutingSearchParameters;
+import com.google.ortools.constraintsolver.main;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -14,6 +23,52 @@ public class Main {
         // Initialize the TimeDistanceMatrix
         OpenRouteServiceDistanceMatrix matrix = new OpenRouteServiceDistanceMatrix(apiKey, locations);
         // Print the matrix
-        matrix.printMatrix();
+        long[][] timeDistanceMatrix = matrix.createMatrix();
+        // Number of vehicles
+        int numberOfVehicles = 4;
+        int depot = 0;
+
+
+        Loader.loadNativeLibraries();
+        // Instantiate the data problem.
+        final DataModel data = new DataModel(timeDistanceMatrix, numberOfVehicles, depot);
+
+        // Create Routing Index Manager
+        RoutingIndexManager manager = new RoutingIndexManager(data.getDistanceMatrix().length, data.getNumberOfVehicles(), data.getDepot());
+
+        // Create Routing Model.
+        RoutingModel routing = new RoutingModel(manager);
+
+        // Create and register a transit callback.
+        final int transitCallbackIndex =
+                routing.registerTransitCallback((long fromIndex, long toIndex) -> {
+                    // Convert from routing variable Index to user NodeIndex.
+                    int fromNode = manager.indexToNode(fromIndex);
+                    int toNode = manager.indexToNode(toIndex);
+                    return data.getDistanceMatrix()[fromNode][toNode];
+                });
+
+        // Define cost of each arc.
+        routing.setArcCostEvaluatorOfAllVehicles(transitCallbackIndex);
+
+        // Add Distance constraint.
+        routing.addDimension(transitCallbackIndex, 0, 70000,
+                true, // start cumul to zero
+                "Duration");
+        RoutingDimension distanceDimension = routing.getMutableDimension("Duration");
+        distanceDimension.setGlobalSpanCostCoefficient(70000);
+
+        // Setting first solution heuristic.
+        RoutingSearchParameters searchParameters =
+                main.defaultRoutingSearchParameters()
+                        .toBuilder()
+                        .setFirstSolutionStrategy(FirstSolutionStrategy.Value.PATH_CHEAPEST_ARC)
+                        .build();
+
+        // Solve the problem.
+        Assignment solution = routing.solveWithParameters(searchParameters);
+
+        // Print solution on console.
+        data.printSolution(data, routing, manager, solution);
     }
 }
