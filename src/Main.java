@@ -2,13 +2,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import com.google.ortools.Loader;
-import com.google.ortools.constraintsolver.Assignment;
-import com.google.ortools.constraintsolver.FirstSolutionStrategy;
-import com.google.ortools.constraintsolver.RoutingDimension;
-import com.google.ortools.constraintsolver.RoutingIndexManager;
-import com.google.ortools.constraintsolver.RoutingModel;
-import com.google.ortools.constraintsolver.RoutingSearchParameters;
-import com.google.ortools.constraintsolver.main;
+import com.google.ortools.constraintsolver.*;
+import com.google.protobuf.Duration;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -62,7 +57,10 @@ public class Main {
         RoutingSearchParameters searchParameters =
                 main.defaultRoutingSearchParameters()
                         .toBuilder()
-                        .setFirstSolutionStrategy(FirstSolutionStrategy.Value.PATH_CHEAPEST_ARC)
+                        .setFirstSolutionStrategy(FirstSolutionStrategy.Value.SAVINGS)
+                        .setLocalSearchMetaheuristic(LocalSearchMetaheuristic.Value.GUIDED_LOCAL_SEARCH)
+                        .setTimeLimit(Duration.newBuilder().setSeconds(30).build())
+                        .setLogSearch(true)
                         .build();
 
         // Solve the problem.
