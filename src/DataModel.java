@@ -26,7 +26,7 @@ public class DataModel {
     }
 
     /// @brief Print the solution.
-    public void printSolution(DataModel data, RoutingModel routing, RoutingIndexManager manager, Assignment solution) {
+    public void getSolution(DataModel data, RoutingModel routing, RoutingIndexManager manager, Assignment solution) {
         // Solution cost.
         //logger.info("Objective : " + solution.objectiveValue());
         // Inspect solution.

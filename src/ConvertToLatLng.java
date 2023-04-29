@@ -11,10 +11,10 @@ public class ConvertToLatLng {
         private List<List<Location>> vehicleRoutes;
         private int numVehicles;
         private int vehicleCapacity;
-        public ConvertToLatLng(String[] postalCodes) {
+        public ConvertToLatLng(String[] postalCodes, String geocoderAPIKey) {
             this.locations = new ArrayList<>();
             // Geocoder receives an api-key so that the methods can be used to get the location of the postal code
-            this.geocoder = new Geocoder("c9941b30ff46475186fc03e68861bf3d");
+            this.geocoder = new Geocoder(geocoderAPIKey);
             this.postalCodes = postalCodes;
         }
         public void makeLatLngList() {
