@@ -8,6 +8,7 @@ import java.util.List;
 public class VRPCalculator {
     private String geocoderAPIKey;
     private String openRouteServiceAPIKey;
+    private String[] postalCodes;
     private ConvertToLatLng converter;
     private List<Location> Locations;
     private OpenRouteServiceDistanceMatrix matrix;
@@ -18,12 +19,14 @@ public class VRPCalculator {
         // ApiKeys to be used for the program
         this.geocoderAPIKey = geocoderAPIKey;
         this.openRouteServiceAPIKey = openRouteServiceAPIKey;
+        // postalCodes which will be used to get the LatLong coordinates
+        this.postalCodes = postalCodes;
         // Initialize the converter and pass the list of postal codes
-        this.converter = new ConvertToLatLng(postalCodes, geocoderAPIKey);
+        this.converter = new ConvertToLatLng(this.postalCodes, this.geocoderAPIKey);
         // LatLong coordinates for the postalcodes
         this.Locations = converter.getLocations();
         // Initialize the TimeDistanceMatrix
-        this.matrix = new OpenRouteServiceDistanceMatrix(openRouteServiceAPIKey, this.Locations);
+        this.matrix = new OpenRouteServiceDistanceMatrix(this.openRouteServiceAPIKey, this.Locations);
         // create the matrix
         this.timeDistanceMatrix = this.matrix.createMatrix();
         // Determines the amount of vehicles used in the algorithm

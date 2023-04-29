@@ -2,15 +2,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConvertToLatLng {
-
         private List<Location> locations;
         private Geocoder geocoder;
         private String[] postalCodes;
-        private double[][] timeDistanceMatrix;
         private List<TimeWindow> timeWindows;
-        private List<List<Location>> vehicleRoutes;
-        private int numVehicles;
-        private int vehicleCapacity;
         public ConvertToLatLng(String[] postalCodes, String geocoderAPIKey) {
             this.locations = new ArrayList<>();
             // Geocoder receives an api-key so that the methods can be used to get the location of the postal code
