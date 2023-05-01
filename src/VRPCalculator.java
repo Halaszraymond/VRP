@@ -1,7 +1,7 @@
-import com.google.ortools.Loader;
-import com.google.ortools.constraintsolver.RoutingIndexManager;
 import com.google.ortools.constraintsolver.*;
 import com.google.protobuf.Duration;
+import com.google.ortools.Loader;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -13,9 +13,11 @@ public class VRPCalculator {
     private List<Location> Locations;
     private OpenRouteServiceDistanceMatrix matrix;
     private long[][] timeDistanceMatrix;
+    private long[] demands;
+    private long[] vehicleCapacities;
     private int numberOfVehicles;
     private int depot;
-    public VRPCalculator(String geocoderAPIKey, String openRouteServiceAPIKey, String[] postalCodes, int numberOfVehicles, int depot) throws IOException {
+    public VRPCalculator(String geocoderAPIKey, String openRouteServiceAPIKey, String[] postalCodes, long[] demands, long[] vehicleCapacities, int numberOfVehicles, int depot) throws IOException, IOException {
         // ApiKeys to be used for the program
         this.geocoderAPIKey = geocoderAPIKey;
         this.openRouteServiceAPIKey = openRouteServiceAPIKey;
@@ -29,6 +31,10 @@ public class VRPCalculator {
         this.matrix = new OpenRouteServiceDistanceMatrix(this.openRouteServiceAPIKey, this.Locations);
         // create the matrix
         this.timeDistanceMatrix = this.matrix.createMatrix();
+        // demands per location
+        this.demands = demands;
+        // Capacity per vehicle
+        this.vehicleCapacities = vehicleCapacities;
         // Determines the amount of vehicles used in the algorithm
         this.numberOfVehicles = numberOfVehicles;
         // Gets the depot location in the matrix
@@ -37,11 +43,15 @@ public class VRPCalculator {
     public void calculateVRP() throws IOException {
         Loader.loadNativeLibraries();
         // Instantiate the data problem.
-        DataModel data = new DataModel(this.timeDistanceMatrix, this.numberOfVehicles, this.depot);
+        final DataModel data = new DataModel(this.timeDistanceMatrix, this.demands, this.vehicleCapacities, this.numberOfVehicles, this.depot);
+
         // Create Routing Index Manager
-        RoutingIndexManager manager = new RoutingIndexManager(data.getDistanceMatrix().length, data.getNumberOfVehicles(), data.getDepot());
+        RoutingIndexManager manager =
+                new RoutingIndexManager(data.getDistanceMatrix().length, data.getNumberOfVehicles(), data.getDepot());
+
         // Create Routing Model.
         RoutingModel routing = new RoutingModel(manager);
+
         // Create and register a transit callback.
         final int transitCallbackIndex =
                 routing.registerTransitCallback((long fromIndex, long toIndex) -> {
@@ -50,26 +60,37 @@ public class VRPCalculator {
                     int toNode = manager.indexToNode(toIndex);
                     return data.getDistanceMatrix()[fromNode][toNode];
                 });
+
         // Define cost of each arc.
         routing.setArcCostEvaluatorOfAllVehicles(transitCallbackIndex);
-        // Add Distance constraint.
-        routing.addDimension(transitCallbackIndex, 0, 70000,
+
+        // Add Capacity constraint.
+        final int demandCallbackIndex = routing.registerUnaryTransitCallback((long fromIndex) -> {
+            // Convert from routing variable Index to user NodeIndex.
+            int fromNode = manager.indexToNode(fromIndex);
+            return data.getDemands()[fromNode];
+        });
+        routing.addDimensionWithVehicleCapacity(demandCallbackIndex, 0, // null capacity slack
+                data.getVehicleCapacities(), // vehicle maximum capacities
                 true, // start cumul to zero
-                "Duration");
-        RoutingDimension distanceDimension = routing.getMutableDimension("Duration");
-        distanceDimension.setGlobalSpanCostCoefficient(70000);
+                "Capacity");
+
         // Setting first solution heuristic.
         RoutingSearchParameters searchParameters =
                 main.defaultRoutingSearchParameters()
                         .toBuilder()
-                        .setFirstSolutionStrategy(FirstSolutionStrategy.Value.SAVINGS)
+                        .setFirstSolutionStrategy(FirstSolutionStrategy.Value.PATH_CHEAPEST_ARC)
                         .setLocalSearchMetaheuristic(LocalSearchMetaheuristic.Value.GUIDED_LOCAL_SEARCH)
-                        .setTimeLimit(Duration.newBuilder().setSeconds(30).build())
-                        .setLogSearch(true)
+                        .setTimeLimit(Duration.newBuilder().setSeconds(1).build())
                         .build();
+
         // Solve the problem.
         Assignment solution = routing.solveWithParameters(searchParameters);
-        // Print solution on console.
-        data.getSolution(data, routing, manager, solution);
+        if (solution != null) {
+            // Print solution on console.
+            data.getSolution(data, routing, manager, solution);
+        } else {
+            System.out.println("No solution found.");
+        }
     }
 }
