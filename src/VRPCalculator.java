@@ -79,7 +79,7 @@ public class VRPCalculator {
         RoutingSearchParameters searchParameters =
                 main.defaultRoutingSearchParameters()
                         .toBuilder()
-                        .setFirstSolutionStrategy(FirstSolutionStrategy.Value.PATH_CHEAPEST_ARC)
+                        .setFirstSolutionStrategy(FirstSolutionStrategy.Value.SAVINGS)
                         .setLocalSearchMetaheuristic(LocalSearchMetaheuristic.Value.GUIDED_LOCAL_SEARCH)
                         .setTimeLimit(Duration.newBuilder().setSeconds(1).build())
                         .build();
