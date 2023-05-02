@@ -18,7 +18,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         // Initialize the VRP calculator
         VRPCalculator calculator = new VRPCalculator(geocoderAPIKey, openRouteServiceAPIKey, postalCodes, demands, vehicleCapacity, numberOfVehicles, depot);
-        // Calculates the best routes, building needs some time (+- 20 seconds)
-        calculator.calculateVRP();
+        // Calculates the best routes, building needs some time (+- 20 seconds)... routesList is a 2D array of routes and its locations.
+        int[][] routeslist = calculator.calculateVRP();
     }
 }

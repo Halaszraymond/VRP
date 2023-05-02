@@ -50,7 +50,7 @@ public class VRPCalculator {
         }
         return vehicleCapacities;
     }
-    public void calculateVRP() throws IOException {
+    public int[][] calculateVRP() throws IOException {
         Loader.loadNativeLibraries();
         // Instantiate the data problem.
         final DataModel data = new DataModel(this.timeDistanceMatrix, this.demands, this.vehicleCapacity, this.vehicleCapacities, this.numberOfVehicles, this.depot);
@@ -98,9 +98,11 @@ public class VRPCalculator {
         Assignment solution = routing.solveWithParameters(searchParameters);
         if (solution != null) {
             // Print solution on console.
-            data.getSolution(data, routing, manager, solution);
+            int[][] routesList = data.getSolution(data, routing, manager, solution);
+            return routesList;
         } else {
             System.out.println("No solution found, make sure that the total capacity of the vans does not exceed the total demand. If it doesnt help, change the algorithm");
+            return null;
         }
     }
 }
