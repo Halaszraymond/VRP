@@ -10,16 +10,15 @@ public class Main {
     // Demands per postal Code, keep in mind that the total demands must not exceed the total capacity of all vehicles
     private static long[] demands = {0, 1, 1, 2, 4, 2, 4, 8, 8, 1, 2, 1, 2, 4, 4, 8, 8, 6, 4, 5, 7};
     // Capacity of each vehicle, keep in mind that the total demands must not exceed the total capacity of all vehicles
-    private static long vehicleCapacity = 15;
-    //private static long[] vehicleCapacities = {15, 15, 15, 15, 15, 15};;
+    private static long vehicleCapacity = 30;
     // Number of vehicles
-    private static int numberOfVehicles = 6;
+    private static int numberOfVehicles = 10;
     // Location of the depot
     private static int depot = 0;
     public static void main(String[] args) throws IOException {
         // Initialize the VRP calculator
         VRPCalculator calculator = new VRPCalculator(geocoderAPIKey, openRouteServiceAPIKey, postalCodes, demands, vehicleCapacity, numberOfVehicles, depot);
-        // Calculates the best routes
+        // Calculates the best routes, building needs some time (+- 20 seconds)
         calculator.calculateVRP();
     }
 }

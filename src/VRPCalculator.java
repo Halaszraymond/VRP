@@ -89,9 +89,9 @@ public class VRPCalculator {
         RoutingSearchParameters searchParameters =
                 main.defaultRoutingSearchParameters()
                         .toBuilder()
-                        .setFirstSolutionStrategy(FirstSolutionStrategy.Value.PATH_CHEAPEST_ARC)
+                        .setFirstSolutionStrategy(FirstSolutionStrategy.Value.SAVINGS)
                         .setLocalSearchMetaheuristic(LocalSearchMetaheuristic.Value.GUIDED_LOCAL_SEARCH)
-                        .setTimeLimit(Duration.newBuilder().setSeconds(1).build())
+                        .setTimeLimit(Duration.newBuilder().setSeconds(10).build())
                         .build();
 
         // Solve the problem.
@@ -100,7 +100,7 @@ public class VRPCalculator {
             // Print solution on console.
             data.getSolution(data, routing, manager, solution);
         } else {
-            System.out.println("No solution found.");
+            System.out.println("No solution found, make sure that the total capacity of the vans does not exceed the total demand. If it doesnt help, change the algorithm");
         }
     }
 }
