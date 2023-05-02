@@ -50,12 +50,12 @@ public class DataModel {
         // Solution cost.
         //logger.info("Objective: " + solution.objectiveValue());
         // Inspect solution.
-        long totalDistance = 0;
+        long totalDuration = 0;
         long totalLoad = 0;
         for (int i = 0; i < this.numberOfVehicles; ++i) {
             long index = routing.start(i);
             //logger.info("Route for Vehicle " + i + ":");
-            long routeDistance = 0;
+            long routeDuration = 0;
             long routeLoad = 0;
             String route = "";
             int nodeCount = 0;
@@ -67,49 +67,20 @@ public class DataModel {
                 nodeCount++;
                 long previousIndex = index;
                 index = solution.value(routing.nextVar(index));
-                routeDistance += routing.getArcCostForVehicle(previousIndex, index, i);
+                routeDuration += routing.getArcCostForVehicle(previousIndex, index, i);
             }
             routes[i][nodeCount] = (int) manager.indexToNode(routing.end(i));
-            System.out.println("Vehicle " + i + ": " + route + "Total duration: " + (routeDistance/60) + " minutes");
+            System.out.println("Vehicle " + i + ": " + route + "Total duration: " + (routeDuration/60) + " minutes");
             route += manager.indexToNode(routing.end(i));
             //logger.info(route);
-            //logger.info("Distance of the route: " + routeDistance + "m");
-            totalDistance += routeDistance;
+            //logger.info("Distance of the route: " + routeDistance + " minutes");
+            totalDuration += routeDuration;
             totalLoad += routeLoad;
         }
-        //logger.info("Total distance of all routes: " + totalDistance + "m");
+        System.out.println("\nTotal duration of all routes: " + (totalDuration/60) + " minutes");
+        System.out.println("Total load of all routes: " + totalLoad);
+        //logger.info("Total duration of all routes: " + (totalDuration/60) + " minutes");
         //logger.info("Total load of all routes: " + totalLoad);
         return routes;
     }
-//    public void getSolution(
-//            DataModel data, RoutingModel routing, RoutingIndexManager manager, Assignment solution) {
-//        // Solution cost.
-//        //logger.info("Objective: " + solution.objectiveValue());
-//        // Inspect solution.
-//        long totalDistance = 0;
-//        long totalLoad = 0;
-//        for (int i = 0; i < this.numberOfVehicles; ++i) {
-//            long index = routing.start(i);
-//            //logger.info("Route for Vehicle " + i + ":");
-//            long routeDistance = 0;
-//            long routeLoad = 0;
-//            String route = "";
-//            while (!routing.isEnd(index)) {
-//                long nodeIndex = manager.indexToNode(index);
-//                routeLoad += data.demands[(int) nodeIndex];
-//                route += nodeIndex + " Load(" + routeLoad + ") -> ";
-//                long previousIndex = index;
-//                index = solution.value(routing.nextVar(index));
-//                routeDistance += routing.getArcCostForVehicle(previousIndex, index, i);
-//            }
-//            System.out.println("Vehicle " + i + ": " + route + "Total duration: " + (routeDistance/60) + " minutes");
-//            route += manager.indexToNode(routing.end(i));
-//            //logger.info(route);
-//            //logger.info("Distance of the route: " + routeDistance + "m");
-//            totalDistance += routeDistance;
-//            totalLoad += routeLoad;
-//        }
-//        //logger.info("Total distance of all routes: " + totalDistance + "m");
-//        //logger.info("Total load of all routes: " + totalLoad);
-//    }
 }
