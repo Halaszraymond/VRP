@@ -14,10 +14,11 @@ public class VRPCalculator {
     private OpenRouteServiceDistanceMatrix matrix;
     private long[][] timeDistanceMatrix;
     private long[] demands;
+    private long vehicleCapacity;
     private long[] vehicleCapacities;
     private int numberOfVehicles;
     private int depot;
-    public VRPCalculator(String geocoderAPIKey, String openRouteServiceAPIKey, String[] postalCodes, long[] demands, long[] vehicleCapacities, int numberOfVehicles, int depot) throws IOException, IOException {
+    public VRPCalculator(String geocoderAPIKey, String openRouteServiceAPIKey, String[] postalCodes, long[] demands, long vehicleCapacity, int numberOfVehicles, int depot) throws IOException, IOException {
         // ApiKeys to be used for the program
         this.geocoderAPIKey = geocoderAPIKey;
         this.openRouteServiceAPIKey = openRouteServiceAPIKey;
@@ -34,16 +35,25 @@ public class VRPCalculator {
         // demands per location
         this.demands = demands;
         // Capacity per vehicle
-        this.vehicleCapacities = vehicleCapacities;
+        this.vehicleCapacity = vehicleCapacity;
         // Determines the amount of vehicles used in the algorithm
         this.numberOfVehicles = numberOfVehicles;
+        // Capacity for all vehicles
+        this.vehicleCapacities = getVehicleCapacities();
         // Gets the depot location in the matrix
         this.depot = depot;
+    }
+    public long[] getVehicleCapacities() {
+        long[] vehicleCapacities = new long[this.numberOfVehicles];
+        for (int i = 0; i < this.numberOfVehicles; i++) {
+            vehicleCapacities[i] = this.vehicleCapacity;
+        }
+        return vehicleCapacities;
     }
     public void calculateVRP() throws IOException {
         Loader.loadNativeLibraries();
         // Instantiate the data problem.
-        final DataModel data = new DataModel(this.timeDistanceMatrix, this.demands, this.vehicleCapacities, this.numberOfVehicles, this.depot);
+        final DataModel data = new DataModel(this.timeDistanceMatrix, this.demands, this.vehicleCapacity, this.vehicleCapacities, this.numberOfVehicles, this.depot);
 
         // Create Routing Index Manager
         RoutingIndexManager manager =
@@ -79,7 +89,7 @@ public class VRPCalculator {
         RoutingSearchParameters searchParameters =
                 main.defaultRoutingSearchParameters()
                         .toBuilder()
-                        .setFirstSolutionStrategy(FirstSolutionStrategy.Value.SAVINGS)
+                        .setFirstSolutionStrategy(FirstSolutionStrategy.Value.PATH_CHEAPEST_ARC)
                         .setLocalSearchMetaheuristic(LocalSearchMetaheuristic.Value.GUIDED_LOCAL_SEARCH)
                         .setTimeLimit(Duration.newBuilder().setSeconds(1).build())
                         .build();
