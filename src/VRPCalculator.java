@@ -3,6 +3,7 @@ import com.google.protobuf.Duration;
 import com.google.ortools.Loader;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class VRPCalculator {
@@ -50,7 +51,7 @@ public class VRPCalculator {
         }
         return vehicleCapacities;
     }
-    public int[][] calculateVRP() throws IOException {
+    public ArrayList<ArrayList<Integer>> calculateVRP() throws IOException {
         Loader.loadNativeLibraries();
         // Instantiate the data problem.
         final DataModel data = new DataModel(this.timeDistanceMatrix, this.demands, this.vehicleCapacity, this.vehicleCapacities, this.numberOfVehicles, this.depot);
@@ -89,7 +90,7 @@ public class VRPCalculator {
         RoutingSearchParameters searchParameters =
                 main.defaultRoutingSearchParameters()
                         .toBuilder()
-                        .setFirstSolutionStrategy(FirstSolutionStrategy.Value.SAVINGS)
+                        .setFirstSolutionStrategy(FirstSolutionStrategy.Value.PATH_CHEAPEST_ARC)
                         .setLocalSearchMetaheuristic(LocalSearchMetaheuristic.Value.GUIDED_LOCAL_SEARCH)
                         .setTimeLimit(Duration.newBuilder().setSeconds(10).build())
                         .build();
@@ -98,7 +99,7 @@ public class VRPCalculator {
         Assignment solution = routing.solveWithParameters(searchParameters);
         if (solution != null) {
             // Print solution on console.
-            int[][] routesList = data.getSolution(data, routing, manager, solution);
+            ArrayList<ArrayList<Integer>> routesList = data.getSolution(data, routing, manager, solution);
             return routesList;
         } else {
             System.out.println("No solution found, make sure that the total capacity of the vans does not exceed the total demand. If it doesnt help, change the algorithm");

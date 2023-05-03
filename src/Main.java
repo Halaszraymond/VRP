@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     // apikey to geocoder service (Getting LatLong)
@@ -10,7 +12,7 @@ public class Main {
     // Demands per postal Code, keep in mind that the total demands must not exceed the total capacity of all vehicles
     private static long[] demands = {0, 1, 1, 2, 4, 2, 4, 8, 8, 1, 2, 1, 2, 4, 4, 8, 8, 6, 4, 5, 7};
     // Capacity of each vehicle, keep in mind that the total demands must not exceed the total capacity of all vehicles
-    private static long vehicleCapacity = 30;
+    private static long vehicleCapacity = 20;
     // Number of vehicles
     private static int numberOfVehicles = 10;
     // Location of the depot
@@ -19,6 +21,18 @@ public class Main {
         // Initialize the VRP calculator
         VRPCalculator calculator = new VRPCalculator(geocoderAPIKey, openRouteServiceAPIKey, postalCodes, demands, vehicleCapacity, numberOfVehicles, depot);
         // Calculates the best routes, building needs some time (+- 20 seconds)... routesList is a 2D array of routes and its locations.
-        int[][] routeslist = calculator.calculateVRP();
+        ArrayList<ArrayList<Integer>> routesList = calculator.calculateVRP();
+        // Prints the routes in the ArrayList
+//        System.out.println("\n");
+//        for (ArrayList route : routesList) {
+//            for (int i = 0; i < route.size(); i++) {
+//                if (i != 0) {
+//                    System.out.print(" -> " + route.get(i));
+//                } else {
+//                    System.out.print(route.get(i));
+//                }
+//            }
+//            System.out.println("\n");
+//        }
     }
 }
